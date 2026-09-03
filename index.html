@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>동문당 · 사주 풀이</title>
+<style>
+  :root{
+    --bg:#f4efe6; --ink:#2c2420; --card:#fffdf8; --line:#e0d6c4;
+    --muted:#8a7d6d; --gold:#b8863b; --gold-d:#8f6626; --plum:#6b4a7a;
+    --wx-mok:#4f9d69; --wx-hwa:#d6604d; --wx-to:#c9a227; --wx-geum:#8895a3; --wx-su:#3f6fb0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1c1a24; --ink:#ece7dd; --card:#26232f; --line:#3b3648; --muted:#9a8fa8; --gold:#d0a24b; --gold-d:#d0a24b; }
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:"Pretendard","Malgun Gothic","맑은 고딕",system-ui,sans-serif; background:var(--bg); color:var(--ink); line-height:1.75; }
+  .wrap{ max-width:760px; margin:0 auto; padding:28px 16px 100px; }
+  header{ text-align:center; margin-bottom:24px; }
+  header h1{ font-size:1.6rem; margin:0 0 6px; letter-spacing:-.5px; }
+  header p{ color:var(--muted); font-size:.88rem; margin:0; }
+  .tabs{ display:flex; gap:6px; margin-bottom:18px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:5px; }
+  .tabs button{ flex:1; padding:10px; background:transparent; color:var(--muted); border:0; border-radius:8px; cursor:pointer; font-size:.95rem; font-weight:600; }
+  .tabs button.on{ background:var(--plum); color:#fff; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; }
+  .card h3{ margin:0 0 12px; font-size:1.05rem; color:var(--gold-d); }
+  label{ display:block; font-size:.82rem; color:var(--muted); margin:10px 0 4px; font-weight:600; }
+  input,select{ width:100%; padding:10px; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:8px; font-size:.95rem; }
+  .row{ display:flex; gap:8px; } .row>div{ flex:1; }
+  .chk{ display:flex; align-items:center; gap:8px; margin-top:12px; color:var(--muted); font-size:.88rem; }
+  .chk input{ width:auto; }
+  button.go{ width:100%; margin-top:16px; padding:14px; background:var(--gold); color:#fff; border:0; border-radius:10px; font-size:1.02rem; font-weight:700; cursor:pointer; }
+  button.go:disabled{ opacity:.6; cursor:wait; }
+  .topics{ display:flex; gap:6px; margin-top:14px; flex-wrap:wrap; }
+  .topics button{ flex:1 1 40%; padding:10px 4px; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:8px; cursor:pointer; font-size:.92rem; font-weight:600; }
+  .topics button.on{ background:var(--gold); color:#fff; border-color:var(--gold); }
+
+  table.pillars{ width:100%; border-collapse:collapse; margin-top:4px; font-size:.9rem; }
+  table.pillars th,table.pillars td{ border:1px solid var(--line); padding:8px 4px; text-align:center; }
+  table.pillars th{ color:var(--muted); font-weight:600; background:var(--bg); }
+  .gz{ font-size:1.3rem; font-weight:800; line-height:1.2; }
+  .gz .g{ display:block; } .gz .z{ display:block; }
+  .sub10{ font-size:.72rem; color:var(--muted); }
+  .jj{ font-size:.75rem; color:var(--muted); }
+
+  .wxbars{ margin-top:8px; }
+  .wxrow{ display:flex; align-items:center; gap:8px; margin:5px 0; font-size:.85rem; }
+  .wxrow .name{ width:70px; color:var(--muted); }
+  .wxrow .track{ flex:1; background:var(--bg); border-radius:6px; overflow:hidden; height:16px; border:1px solid var(--line); }
+  .wxrow .fill{ height:100%; }
+  .wxrow .num{ width:20px; text-align:right; color:var(--muted); }
+
+  .daeun{ display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; }
+  .daeun .du{ min-width:76px; text-align:center; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px 4px; }
+  .daeun .du .age{ font-size:.72rem; color:var(--muted); }
+  .daeun .du .gz2{ font-size:1rem; font-weight:700; margin:2px 0; }
+  .daeun .du .yr{ font-size:.68rem; color:var(--muted); }
+
+  .reading{ margin-top:2px; }
+  .muted{ color:var(--muted); font-size:.84rem; }
+  .err{ color:#c0392b; }
+  .badge{ display:inline-block; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:2px 8px; margin:2px; font-size:.84rem; }
+  .actions{ display:flex; gap:8px; margin-top:12px; }
+  .actions button{ flex:1; padding:10px; background:var(--bg); border:1px solid var(--line); border-radius:8px; cursor:pointer; color:var(--ink); font-weight:600; }
+
+  .people{ margin-bottom:6px; }
+  .people-row{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .pchip{ display:inline-flex; align-items:center; gap:5px; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:4px 10px; font-size:.85rem; cursor:pointer; }
+  .pchip .pdel{ color:var(--muted); font-weight:400; font-size:.72rem; cursor:pointer; }
+  .pchip .pdel:hover{ color:var(--wx-hwa); }
+  .psave{ background:transparent; border:1px dashed var(--line); border-radius:14px; padding:4px 10px; font-size:.82rem; color:var(--muted); cursor:pointer; }
+
+  @media print{
+    .tabs,.topics,button.go,.actions,.people,#form-one,#form-a,#form-b,.chk,header,#one-timing,#one-event,#one-checkname,#one-people,select{ display:none !important; }
+    body{ background:#fff; color:#000; }
+    .wrap{ max-width:none; padding:0; }
+    .card{ border:1px solid #ccc; break-inside:avoid; box-shadow:none; margin-bottom:10px; }
+    .reading{ font-size:.92rem; }
+    h2,h3{ color:#000 !important; }
+    a[href]:after{ content:""; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔮 동문당</h1>
+    <p>생년월일시로 사주팔자를 계산하고 AI가 풀이합니다 · 데이터는 저장되지 않습니다</p>
+    <p style="font-size:.72rem;opacity:.6">버전 v1.6 · 2026-08-27</p>
+  </header>
+
+  <div class="tabs">
+    <button id="tab-one" class="on" onclick="setTab('one')">내 사주</button>
+    <button id="tab-gung" onclick="setTab('gung')">궁합</button>
+    <button id="tab-iching" onclick="setTab('iching')">주역점</button>
+  </div>
+
+  <div id="view-one">
+    <div class="card">
+      <h3>생년월일 입력</h3>
+      <div id="form-one"></div>
+      <div class="topics">
+        <button class="topic on" data-t="총운">총운·성격</button>
+        <button class="topic" data-t="연애">연애·결혼</button>
+        <button class="topic" data-t="재물">재물·직업</button>
+        <button class="topic" data-t="건강">건강·체질</button>
+      </div>
+      <button class="go" onclick="runOne()">사주 풀이 보기</button>
+      <button class="go" style="background:var(--gold-d);margin-top:8px;color:#fff" onclick="runReport()">📋 종합 리포트 (한 번에)</button>
+      <div class="row" style="margin-top:8px;gap:8px">
+        <button class="go" style="background:var(--plum);margin:0" onclick="runDaily()">오늘의 운세</button>
+        <button class="go" style="background:var(--plum);margin:0" onclick="runLuck()">올해·이번 달 운세</button>
+      </div>
+      <button class="go" style="background:var(--plum);margin-top:8px" onclick="runFamily()">가족운 (부모·형제·배우자·자녀)</button>
+      <div class="row" style="margin-top:8px;gap:8px;align-items:stretch">
+        <select id="one-timing" style="flex:0 0 130px">
+          <option value="취업">취업·이직</option>
+          <option value="결혼">결혼·인연</option>
+          <option value="재물">재물·투자</option>
+          <option value="시험">시험·합격</option>
+          <option value="이동">이사·이동</option>
+        </select>
+        <button class="go" style="background:var(--plum);margin:0;flex:1" onclick="runTiming()">시기 분석 (언제가 좋을까?)</button>
+      </div>
+      <div class="row" style="margin-top:8px;gap:8px;align-items:stretch">
+        <select id="one-event" style="flex:0 0 130px">
+          <option value="결혼">결혼</option>
+          <option value="이사">이사</option>
+          <option value="개업">개업</option>
+          <option value="계약">계약</option>
+          <option value="여행">여행</option>
+          <option value="기타">기타</option>
+        </select>
+        <button class="go" style="background:var(--plum);margin:0;flex:1" onclick="runTaegil()">택일 (좋은 날 찾기)</button>
+      </div>
+      <button class="go" style="background:var(--plum);margin-top:8px" onclick="runBanwi()">이사 방위 (어느 쪽으로?)</button>
+      <div class="row" style="margin-top:8px;gap:8px;align-items:stretch">
+        <input id="one-checkname" placeholder="풀이할 이름 (성+이름)" style="flex:1" />
+        <button class="go" style="background:var(--plum);margin:0;flex:0 0 130px" onclick="runIreum()">이름 오행</button>
+      </div>
+      <p class="muted" style="font-size:.78rem;margin-top:10px">
+        사주팔자·신강신약·신살·대운 등 <b>계산 결과는 즉시</b> 나옵니다.
+        AI 풀이 글은 이 노트북에서 1~2분 걸리고 그동안 컴퓨터가 느려질 수 있어요 —
+        다른 브라우저 창을 닫고 기다리면 됩니다.
+      </p>
+    </div>
+    <div id="out-one"></div>
+  </div>
+
+  <div id="view-gung" style="display:none">
+    <div class="card"><h3>A · 본인</h3><div id="form-a"></div></div>
+    <div class="card"><h3>B · 상대</h3><div id="form-b"></div></div>
+    <div class="card"><button class="go" onclick="runGung()">궁합 보기</button></div>
+    <div id="out-gung"></div>
+  </div>
+
+  <div id="view-iching" style="display:none">
+    <div class="card">
+      <h3>주역 동전점</h3>
+      <p class="muted">마음속으로 물음을 정하고, 동전 6번을 던집니다. (본괘 → 변효 → 변괘)</p>
+      <label>질문 (예: 이 일을 지금 시작해도 될까?)</label>
+      <input id="ic-q" placeholder="궁금한 것을 한 문장으로" />
+      <div id="ic-lines" style="margin:16px 0;text-align:center"></div>
+      <button class="go" onclick="runIching()">🪙 동전 던지기</button>
+    </div>
+    <div id="out-iching"></div>
+  </div>
+</div>
+
+<script>
+const now = new Date();
+const WXCOLOR = { '목':'var(--wx-mok)', '화':'var(--wx-hwa)', '토':'var(--wx-to)', '금':'var(--wx-geum)', '수':'var(--wx-su)' };
+const WXHAN = { '목':'木', '화':'火', '토':'土', '금':'金', '수':'水' };
+
+function formHtml(prefix){
+  const years=[]; for(let y=now.getFullYear(); y>=1930; y--) years.push(y);
+  return `
+    <div id="${prefix}-people" class="people"></div>
+    <label>이름 (선택)</label>
+    <input id="${prefix}-name" placeholder="이름" />
+    <div class="row">
+      <div><label>연도</label><select id="${prefix}-year">${years.map(y=>`<option>${y}</option>`).join('')}</select></div>
+      <div><label>월</label><select id="${prefix}-month">${Array.from({length:12},(_,i)=>`<option>${i+1}</option>`).join('')}</select></div>
+      <div><label>일</label><select id="${prefix}-day">${Array.from({length:31},(_,i)=>`<option>${i+1}</option>`).join('')}</select></div>
+    </div>
+    <div class="row">
+      <div><label>시 (모르면 비움)</label><select id="${prefix}-hour"><option value="">모름</option>${Array.from({length:24},(_,i)=>`<option value="${i}">${String(i).padStart(2,'0')}시</option>`).join('')}</select></div>
+      <div><label>분</label><select id="${prefix}-minute">${Array.from({length:12},(_,i)=>`<option value="${i*5}">${String(i*5).padStart(2,'0')}분</option>`).join('')}</select></div>
+      <div><label>성별</label><select id="${prefix}-gender"><option>남</option><option>여</option></select></div>
+    </div>
+    <label>양력 / 음력</label>
+    <select id="${prefix}-cal"><option value="solar">양력 (신분증 생일)</option><option value="lunar">음력 (평달)</option><option value="lunarleap">음력 (윤달)</option></select>
+    <div class="chk"><input type="checkbox" id="${prefix}-tst" checked /><label for="${prefix}-tst" style="margin:0">진태양시 보정 (한국 기준 약 -32분, 권장)</label></div>
+  `;
+}
+document.getElementById('form-one').innerHTML=formHtml('one');
+document.getElementById('form-a').innerHTML=formHtml('a');
+document.getElementById('form-b').innerHTML=formHtml('b');
+
+// ── 저장된 사람 (localStorage) ──
+const PKEY='dongmundang_people';
+function loadPeople(){ try{ return JSON.parse(localStorage.getItem(PKEY)||'[]'); }catch(e){ return []; } }
+function savePeople(arr){ try{ localStorage.setItem(PKEY, JSON.stringify(arr)); }catch(e){} }
+
+function applyPerson(prefix, p){
+  const set=(k,v)=>{ const el=document.getElementById(`${prefix}-${k}`); if(el!=null) el.value=v; };
+  set('name',p.name||''); set('year',p.year); set('month',p.month); set('day',p.day);
+  set('hour',p.hour==null?'':p.hour); set('minute',p.minute||0); set('gender',p.gender||'남');
+  set('cal',p.cal||'solar');
+  const tst=document.getElementById(`${prefix}-tst`); if(tst) tst.checked = p.tst!==false;
+}
+function savePerson(prefix){
+  const f=readForm(prefix);
+  const name=(f.name||'').trim();
+  if(!name){ alert('저장하려면 이름을 먼저 입력하세요.'); return; }
+  const person={ name, year:f.year, month:f.month, day:f.day, hour:f.hour===''?null:f.hour,
+    minute:f.minute||0, gender:f.gender, cal:(f.isLunar?(f.isLeapMonth?'lunarleap':'lunar'):'solar'), tst:f.trueSolarTime };
+  const arr=loadPeople().filter(x=>x.name!==name);
+  arr.unshift(person); savePeople(arr.slice(0,50)); renderPeople();
+}
+function deletePerson(name){
+  savePeople(loadPeople().filter(x=>x.name!==name)); renderPeople();
+}
+function renderPeople(){
+  const arr=loadPeople();
+  ['one','a','b'].forEach(prefix=>{
+    const box=document.getElementById(`${prefix}-people`);
+    if(!box) return;
+    box.innerHTML = `
+      <div class="people-row">
+        ${arr.length? arr.map(p=>`<span class="pchip" data-n="${encodeURIComponent(p.name)}" data-p="${prefix}">
+            ${p.name}<b class="pdel" data-n="${encodeURIComponent(p.name)}">✕</b>
+          </span>`).join('') : '<span class="muted" style="font-size:.8rem">저장된 사람 없음</span>'}
+        <button type="button" class="psave" data-p="${prefix}">＋ 현재 입력 저장</button>
+      </div>`;
+    box.querySelectorAll('.pchip').forEach(el=>el.onclick=(ev)=>{
+      if(ev.target.classList.contains('pdel')) return;
+      const p=loadPeople().find(x=>x.name===decodeURIComponent(el.dataset.n));
+      if(p) applyPerson(el.dataset.p, p);
+    });
+    box.querySelectorAll('.pdel').forEach(el=>el.onclick=(ev)=>{
+      ev.stopPropagation();
+      if(confirm(decodeURIComponent(el.dataset.n)+' 삭제할까요?')) deletePerson(decodeURIComponent(el.dataset.n));
+    });
+    box.querySelector('.psave').onclick=()=>savePerson(prefix);
+  });
+}
+renderPeople();
+
+let topic='총운';
+document.querySelectorAll('.topic').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.topic').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); topic=b.dataset.t;
+});
+
+function setTab(t){
+  ['one','gung','iching'].forEach(k=>{
+    document.getElementById('view-'+k).style.display = t===k?'':'none';
+    document.getElementById('tab-'+k).classList.toggle('on', t===k);
+  });
+}
+
+function readForm(prefix){
+  const cal=document.getElementById(`${prefix}-cal`).value;
+  return {
+    name:document.getElementById(`${prefix}-name`).value,
+    year:document.getElementById(`${prefix}-year`).value,
+    month:document.getElementById(`${prefix}-month`).value,
+    day:document.getElementById(`${prefix}-day`).value,
+    hour:document.getElementById(`${prefix}-hour`).value,
+    minute:document.getElementById(`${prefix}-minute`).value,
+    gender:document.getElementById(`${prefix}-gender`).value,
+    isLunar:cal!=='solar', isLeapMonth:cal==='lunarleap',
+    trueSolarTime:document.getElementById(`${prefix}-tst`).checked
+  };
+}
+
+function pillarCell(p, jj){
+  return `<td>
+    <span class="gz"><span class="g">${p.ganKo}</span><span class="z">${p.zhiKo}</span></span>
+    <span class="sub10">${p.han}</span>
+    ${jj && jj.length ? `<div class="jj">지장간 ${jj.join('·')}</div>` : ''}
+  </td>`;
+}
+
+function wxBars(count){
+  const max=Math.max(...Object.values(count),1);
+  return `<div class="wxbars">${['목','화','토','금','수'].map(n=>{
+    const v=count[n]||0;
+    return `<div class="wxrow">
+      <span class="name">${n} (${WXHAN[n]})</span>
+      <span class="track"><span class="fill" style="width:${v/max*100}%;background:${WXCOLOR[n]}"></span></span>
+      <span class="num">${v}</span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function daeunHtml(d, startAge, basis){
+  if(!d || !d.length) return '';
+  const scored = d.some(x=>x.score!==null);
+  const scoreColor=(s)=> s>=1.5?'var(--wx-mok)': s<=-1.5?'var(--wx-hwa)':'var(--wx-to)';
+  const H=90; // 그래프 높이
+  const graph = scored ? `
+    <div style="display:flex;gap:6px;align-items:flex-end;height:${H+30}px;overflow-x:auto;margin:10px 0;padding-bottom:4px">
+      ${d.map(x=>{
+        const s=x.score||0;
+        const h=Math.max(6, Math.min(H, H/2 + s*8));
+        return `<div style="min-width:66px;text-align:center;display:flex;flex-direction:column;justify-content:flex-end;align-items:center">
+          <div style="font-size:.7rem;color:var(--muted)">${x.score>0?'+':''}${x.score}</div>
+          <div style="width:26px;height:${h}px;background:${scoreColor(s)};border-radius:4px 4px 0 0;${x.current?'outline:2px solid var(--plum);outline-offset:1px':''}"></div>
+          <div style="font-size:.72rem;margin-top:3px;${x.current?'font-weight:700;color:var(--plum)':''}">${x.startAge}세</div>
+          <div style="font-size:.72rem;color:var(--muted)">${x.ganZhiKo}</div>
+          <div style="font-size:.68rem;color:${scoreColor(s)}">${x.label}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <p class="muted" style="font-size:.78rem">${basis==='억부용신'?'억부용신':'부족한 오행 보완'} 기준으로 각 대운을 평가한 <b>인생 흐름 그래프</b>입니다. 초록=순풍, 빨강=역풍, 보라 테두리=현재 대운. 절대적 길흉이 아니라 상대적 흐름으로 보세요.</p>` : `
+    <div class="daeun">${d.map(x=>`
+      <div class="du" ${x.current?'style="outline:2px solid var(--plum)"':''}><div class="age">${x.startAge}세~</div><div class="gz2">${x.ganZhiKo}</div><div class="yr">${x.startYear}~${x.endYear}</div></div>
+    `).join('')}</div>`;
+  return `<div class="card"><h3>대운 · 인생 흐름 (10년 단위)</h3>
+    <p class="muted">약 ${startAge}세부터 대운이 바뀝니다.</p>
+    ${graph}</div>`;
+}
+
+let currentSaju=null, currentLabel='';
+function sajuCards(saju, label){
+  currentSaju=saju; currentLabel=label||'';
+  const p=saju.pillars, ss=saju.shiShen, jj=saju.jijangan||{};
+  return `
+  <div class="card">
+    <h3>${label||''} 사주팔자</h3>
+    <table class="pillars">
+      <tr><th></th><th>시주</th><th>일주</th><th>월주</th><th>년주</th></tr>
+      <tr><th>천간·지지</th>${pillarCell(p.time,jj.time)}${pillarCell(p.day,jj.day)}${pillarCell(p.month,jj.month)}${pillarCell(p.year,jj.year)}</tr>
+      <tr><th>십신</th><td>${ss.time.gan}</td><td>일간(본인)</td><td>${ss.month.gan}</td><td>${ss.year.gan}</td></tr>
+      ${saju.unseong?`<tr><th>12운성</th><td>${saju.unseong.time}</td><td>${saju.unseong.day}</td><td>${saju.unseong.month}</td><td>${saju.unseong.year}</td></tr>`:''}
+    </table>
+    <p class="muted">일간(본인): <b>${saju.dayMaster.ganKo}</b> · 오행 ${saju.dayMaster.wuXing}(${saju.dayMaster.yinYang}) · 띠 ${saju.extra.zodiac} · 공망 ${saju.extra.gongmang||'-'}</p>
+    <p class="muted">양력 ${saju.input.solar} / 음력 ${saju.input.lunar}${saju.input.trueSolarTime?' · 진태양시 보정':''}</p>
+  </div>
+  <div class="card">
+    <h3>오행 분포</h3>
+    ${wxBars(saju.wuXing.count)}
+    <p class="muted">${saju.wuXing.lacking.length?'부족한 오행: <b>'+saju.wuXing.lacking.join(', ')+'</b>':'오행이 고르게 있습니다'} ${saju.wuXing.strong.length?' · 강한 오행: '+saju.wuXing.strong.join(', '):''}</p>
+  </div>
+  ${strengthHtml(saju.strength)}
+  ${relationsHtml(saju.relations)}
+  ${sinsalHtml(saju.sinsal)}
+  ${samjaeHtml(saju.samjae)}
+  ${daeunHtml(saju.daeun, saju.daeunStartAge, saju.daeunBasis)}`;
+}
+
+function relationsHtml(list){
+  if(!list || !list.length) return '';
+  return `<div class="card">
+    <h3>지지 관계 (형·충·회·합)</h3>
+    ${list.map(r=>`<div style="margin:6px 0">
+      <span class="badge" style="border-color:var(--gold)">${r.type}</span> <b>${r.zhi}</b> <span class="muted">· ${r.at}</span><br>
+      <span class="muted" style="font-size:.82rem">${r.desc}</span>
+    </div>`).join('')}
+    <p class="muted" style="font-size:.78rem">※ 관계는 작용의 방향을 보는 것이며, 좋고 나쁨은 사주 전체 균형에 따라 달라집니다.</p>
+  </div>`;
+}
+
+function samjaeHtml(sj){
+  if(!sj || !sj.active) return '';
+  return `<div class="card">
+    <h3>삼재 (三災)</h3>
+    <p>다가오는 삼재: ${sj.upcoming.map(u=>`<span class="badge">${u.year}년 <b>${u.phase}</b></span>`).join(' ')}</p>
+    <p class="muted" style="font-size:.82rem">삼재는 띠 기준 3년 주기입니다. 큰 변화(이직·투자·이사)는 신중하게, 새 시작보다 마무리에 집중하는 시기로 봅니다. 지나치게 두려워할 필요는 없어요.</p>
+  </div>`;
+}
+
+function sinsalHtml(list){
+  if(!list || !list.length) return '';
+  return `<div class="card">
+    <h3>신살 (神殺)</h3>
+    ${list.map(s=>`<div style="margin:8px 0;padding-bottom:8px;border-bottom:1px solid var(--line)">
+      <b style="color:var(--gold-d)">${s.name}</b> <span class="muted">· ${s.at}</span><br>
+      <span class="muted">${s.desc}</span>
+    </div>`).join('')}
+    <p class="muted" style="font-size:.78rem">※ 신살은 참고 상징입니다. 좋고 나쁨을 단정하기보다 기질의 특징으로 보세요.</p>
+  </div>`;
+}
+
+function strengthHtml(st){
+  if(!st) return '';
+  const pct=Math.max(4,Math.min(96,st.score));
+  const color = st.verdict==='신강' ? 'var(--wx-hwa)' : st.verdict==='신약' ? 'var(--wx-su)' : 'var(--wx-to)';
+  return `<div class="card">
+    <h3>신강 · 신약 (일간의 힘)</h3>
+    <div style="display:flex;align-items:center;gap:10px;margin:6px 0">
+      <span class="muted" style="font-size:.78rem">신약</span>
+      <span class="track" style="flex:1;position:relative;height:18px;background:var(--bg);border:1px solid var(--line);border-radius:9px">
+        <span style="position:absolute;left:calc(${pct}% - 2px);top:-3px;width:4px;height:24px;background:${color};border-radius:2px"></span>
+        <span style="position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--line)"></span>
+      </span>
+      <span class="muted" style="font-size:.78rem">신강</span>
+    </div>
+    <p><b style="color:${color}">${st.verdict}</b> · 일간 힘 ${st.score}점 / 100</p>
+    ${st.yongsin.length
+      ? `<p class="muted">억부용신(도움되는 기운): <b>${st.yongsin.join(', ')}</b> · 꺼리는 기운: ${st.gisin.join(', ')}</p>`
+      : `<p class="muted">중화에 가까워 특정 오행 의존도가 낮습니다. 대운 흐름을 중심으로 봅니다.</p>`}
+    <p class="muted" style="font-size:.78rem">※ 억부(抑扶) 기준의 자동 계산입니다. 조후·격국 등 다른 관점에서는 달라질 수 있어요.</p>
+  </div>`;
+}
+
+function mdToHtml(s){
+  return String(s).replace(/</g,'&lt;')
+    .replace(/^###\s*(.+)$/gm,'<h4 style="color:var(--gold-d);margin:14px 0 4px">$1</h4>')
+    .replace(/^\*\*(.+?)\*\*\s*$/gm,'<h4 style="color:var(--gold-d);margin:14px 0 4px">$1</h4>')
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/\n{2,}/g,'<br><br>').replace(/\n/g,'<br>');
+}
+
+let timerId=null;
+function startTimer(btn,label){ let s=0; btn.disabled=true; btn.textContent=`${label} 0초…`;
+  timerId=setInterval(()=>{ s++; btn.textContent=`${label} ${s}초…`; },1000); }
+function stopTimer(btn,label){ if(timerId){clearInterval(timerId);timerId=null;} btn.disabled=false; btn.textContent=label; }
+
+function actionsBar(opts){
+  const card = (opts && opts.noCard) ? '' : `<button onclick="downloadCard()">📷 이미지 카드로 저장</button>`;
+  return `<div class="actions">
+    ${card}
+    <button onclick="window.print()">📄 인쇄 / PDF</button>
+    <button onclick="copyReading(this)">📋 풀이 복사</button>
+  </div>`;
+}
+
+function downloadCard(){
+  const s=currentSaju; if(!s){ alert('먼저 사주를 조회하세요.'); return; }
+  const W=1080,H=1350, cv=document.createElement('canvas');
+  cv.width=W; cv.height=H; const g=cv.getContext('2d');
+  const CREAM='#f4efe6', INK='#2c2420', GOLD='#b8863b', PLUM='#6b4a7a', MUTE='#8a7d6d', LINE='#e0d6c4';
+  const WX={목:'#4f9d69',화:'#d6604d',토:'#c9a227',금:'#8895a3',수:'#3f6fb0'};
+  g.fillStyle=CREAM; g.fillRect(0,0,W,H);
+  g.fillStyle=GOLD; g.fillRect(0,0,W,14);
+  const cx=W/2;
+  g.textAlign='center';
+  g.fillStyle=PLUM; g.font='bold 68px "Malgun Gothic",sans-serif';
+  g.fillText('🔮 동문당', cx, 130);
+  g.fillStyle=MUTE; g.font='30px "Malgun Gothic",sans-serif';
+  g.fillText('사주팔자', cx, 178);
+
+  const nm=(s.pillars && currentLabel) ? currentLabel : '';
+  g.fillStyle=INK; g.font='bold 40px "Malgun Gothic",sans-serif';
+  g.fillText(nm || ' ', cx, 250);
+  g.fillStyle=MUTE; g.font='28px "Malgun Gothic",sans-serif';
+  g.fillText(`양력 ${s.input.solar}  ·  음력 ${s.input.lunar}`, cx, 296);
+
+  // 4 기둥
+  const cols=['시','일','월','년'];
+  const pil=[s.pillars.time,s.pillars.day,s.pillars.month,s.pillars.year];
+  const bw=200, gap=24, totalW=bw*4+gap*3, x0=cx-totalW/2, y0=360, bh=300;
+  pil.forEach((p,i)=>{
+    const x=x0+i*(bw+gap);
+    g.fillStyle='#fffdf8'; g.strokeStyle=LINE; g.lineWidth=2;
+    g.fillRect(x,y0,bw,bh); g.strokeRect(x,y0,bw,bh);
+    g.fillStyle=MUTE; g.font='28px "Malgun Gothic",sans-serif';
+    g.fillText(cols[i]+'주', x+bw/2, y0+46);
+    g.fillStyle=INK; g.font='bold 92px "Malgun Gothic",sans-serif';
+    g.fillText(p.ganKo, x+bw/2, y0+150);
+    g.fillText(p.zhiKo, x+bw/2, y0+250);
+    g.fillStyle=MUTE; g.font='26px serif';
+    g.fillText(p.han, x+bw/2, y0+288);
+  });
+
+  let y=y0+bh+70;
+  g.fillStyle=INK; g.font='bold 34px "Malgun Gothic",sans-serif';
+  g.fillText(`일간 ${s.dayMaster.ganKo} · ${s.dayMaster.wuXing}(${s.dayMaster.yinYang}) · ${s.extra.zodiac}띠`, cx, y);
+  y+=54;
+  if(s.strength){
+    const col = s.strength.verdict==='신강'?WX.화:s.strength.verdict==='신약'?WX.수:WX.토;
+    g.fillStyle=col; g.font='bold 34px "Malgun Gothic",sans-serif';
+    g.fillText(`${s.strength.verdict}  (일간 힘 ${s.strength.score}/100)`, cx, y);
+    y+=50;
+  }
+
+  // 오행 막대
+  const wxc=s.wuXing.count, mx=Math.max(...Object.values(wxc),1);
+  const order=['목','화','토','금','수'];
+  const barW=120, bgap=16, bw2=barW*5+bgap*4, bx0=cx-bw2/2;
+  y+=30; const baseY=y+180;
+  order.forEach((n,i)=>{
+    const x=bx0+i*(barW+bgap); const hh=(wxc[n]/mx)*160;
+    g.fillStyle=LINE; g.fillRect(x,baseY-160,barW,160);
+    g.fillStyle=WX[n]; g.fillRect(x,baseY-hh,barW,hh);
+    g.fillStyle=INK; g.font='bold 30px "Malgun Gothic",sans-serif';
+    g.fillText(n, x+barW/2, baseY+40);
+    g.fillStyle=MUTE; g.font='24px "Malgun Gothic",sans-serif';
+    g.fillText(wxc[n], x+barW/2, baseY-hh-14);
+  });
+  if(s.sinsal && s.sinsal.length){
+    g.fillStyle=MUTE; g.font='26px "Malgun Gothic",sans-serif';
+    g.fillText('신살: '+s.sinsal.map(x=>x.name).join(' · '), cx, baseY+110);
+  }
+
+  g.fillStyle=GOLD; g.fillRect(0,H-70,W,70);
+  g.fillStyle='#fff'; g.font='28px "Malgun Gothic",sans-serif';
+  g.fillText('동문당  ·  재미로 보는 사주  ·  localhost', cx, H-28);
+
+  const a=document.createElement('a');
+  a.download=`동문당_사주_${nm||'결과'}.png`;
+  a.href=cv.toDataURL('image/png');
+  a.click();
+}
+function copyReading(btn){
+  const el=document.querySelector('.reading');
+  if(!el) return;
+  navigator.clipboard.writeText(el.innerText).then(()=>{ btn.textContent='✅ 복사됨'; setTimeout(()=>btn.textContent='📋 풀이 글 복사',1500); });
+}
+
+async function runOne(){
+  const btn=document.querySelector('#view-one .go');
+  const out=document.getElementById('out-one');
+  const body={...readForm('one'), topic};
+  out.innerHTML=`<div class="card muted">사주팔자를 계산하는 중…</div>`;
+  let saju;
+  try{
+    const rc=await fetch('/api/saju',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const dc=await rc.json(); if(!dc.ok) throw new Error(dc.error); saju=dc.saju;
+    out.innerHTML=sajuCards(saju,body.name||'') +
+      `<div class="card muted" id="reading-slot">🔮 AI가 풀이를 쓰는 중입니다. 로컬 AI라 <b>1~2분</b> 걸려요. 창을 닫지 마세요. (다른 브라우저 창을 닫으면 빨라집니다)</div>`;
+  }catch(e){ out.innerHTML=`<div class="card err">입력 오류: ${e.message}</div>`; return; }
+
+  startTimer(btn,'AI가 풀이 쓰는 중');
+  try{
+    const r=await fetch('/api/reading',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    document.getElementById('reading-slot').outerHTML=`
+      <div class="card">
+        <h3>${d.topic} 풀이</h3>
+        <div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용이며 재미로 봐주세요.</p>
+        ${actionsBar()}
+      </div>`;
+  }catch(e){
+    const s=document.getElementById('reading-slot');
+    if(s) s.outerHTML=`<div class="card err">AI 풀이 오류: ${e.message}<br><span class="muted">Ollama 실행 여부 확인. 사주팔자 결과는 위에 있습니다.</span></div>`;
+  }finally{ stopTimer(btn,'사주 풀이 보기'); }
+}
+
+async function runReport(){
+  const btn=document.querySelector('#view-one button.go[onclick="runReport()"]');
+  const out=document.getElementById('out-one');
+  const body=readForm('one');
+  const name=(body.name||'').trim();
+  const steps=[
+    {label:'총운·성격', url:'/api/reading', payload:{...body, topic:'총운'}, key:'reading'},
+    {label:'재물·직업', url:'/api/reading', payload:{...body, topic:'재물'}, key:'reading'},
+    {label:'연애·결혼', url:'/api/reading', payload:{...body, topic:'연애'}, key:'reading'},
+    {label:'가족운',    url:'/api/family',  payload:body, key:'reading'},
+    {label:'올해·이번 달', url:'/api/luck',  payload:body, key:'reading'},
+  ];
+  out.innerHTML=`<div class="card muted">사주팔자를 계산하는 중…</div>`;
+  let saju;
+  try{
+    const rc=await fetch('/api/saju',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const dc=await rc.json(); if(!dc.ok) throw new Error(dc.error); saju=dc.saju;
+  }catch(e){ out.innerHTML=`<div class="card err">입력 오류: ${e.message}</div>`; return; }
+
+  btn.disabled=true;
+  const results={};
+  const t0=Date.now();
+  const today=new Date();
+  const dstr=`${today.getFullYear()}. ${today.getMonth()+1}. ${today.getDate()}`;
+
+  const render=(activeIdx)=>{
+    const done=Object.keys(results).length;
+    const elapsed=Math.round((Date.now()-t0)/1000);
+    const eta = done? Math.round(elapsed/done*(steps.length-done)) : steps.length*180;
+    const progressCard = activeIdx>=0 ? `
+      <div class="card">
+        <h3>종합 리포트 생성 중… (${done}/${steps.length})</h3>
+        <div class="track" style="height:14px;margin:8px 0"><span class="fill" style="width:${done/steps.length*100}%;background:var(--gold);height:100%;display:block;border-radius:7px"></span></div>
+        <p class="muted">지금: <b>${steps[activeIdx].label}</b> 작성 중… (한 항목당 2~4분)<br>
+        예상 남은 시간 약 <b>${Math.ceil(eta/60)}분</b> · 다른 브라우저 창을 닫으면 빨라집니다. 이 탭은 그대로 두세요.</p>
+      </div>` : '';
+    const doneCards = steps.filter(s=>results[s.label]!==undefined).map(s=>
+      `<div class="card"><h3>${s.label}</h3><div class="reading">${mdToHtml(results[s.label])}</div></div>`).join('');
+    const footer = activeIdx<0 ? `
+      <div class="card" style="text-align:center">
+        <p class="muted">본 리포트는 참고용입니다. · 동문당</p>
+        ${actionsBar({noCard:false})}
+        <p class="muted" style="font-size:.78rem;margin-top:8px">카톡 전송: "📄 인쇄 / PDF" → 인쇄창에서 <b>"PDF로 저장"</b> → 저장된 PDF를 카톡 대화에 첨부.</p>
+      </div>` : '';
+    out.innerHTML = `
+      <div class="card" style="text-align:center">
+        <h2 style="margin:4px 0;color:var(--plum)">🔮 동문당 종합 사주 리포트</h2>
+        <p class="muted">${name?name+' 님 · ':''}${saju.input.solar} (음력 ${saju.input.lunar})<br>상담일 ${dstr}</p>
+      </div>
+      ${sajuCards(saju,name)}
+      ${doneCards}
+      ${progressCard}
+      ${footer}`;
+  };
+
+  render(0);
+  for(let i=0;i<steps.length;i++){
+    render(i);
+    const s=steps[i];
+    try{
+      const r=await fetch(s.url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(s.payload)});
+      const d=await r.json();
+      results[s.label] = d.ok ? (d[s.key]||'(내용 없음)') : `(생성 실패: ${d.error})`;
+    }catch(e){ results[s.label] = `(생성 실패: ${e.message})`; }
+    render(i+1<steps.length ? i+1 : -1);
+  }
+  currentSaju=saju; currentLabel=name;
+  btn.disabled=false;
+}
+
+async function runDaily(){
+  const btn=document.querySelector('#view-one button.go[onclick="runDaily()"]');
+  const out=document.getElementById('out-one');
+  const body=readForm('one');
+  out.innerHTML=`<div class="card muted">오늘 일진과 사주를 계산하는 중…</div>`;
+  let saju;
+  try{
+    const rc=await fetch('/api/saju',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const dc=await rc.json(); if(!dc.ok) throw new Error(dc.error); saju=dc.saju;
+    out.innerHTML=sajuCards(saju,body.name||'') +
+      `<div class="card muted" id="reading-slot">🔮 오늘의 운세를 쓰는 중입니다. 로컬 AI라 <b>1~2분</b> 걸려요.</div>`;
+  }catch(e){ out.innerHTML=`<div class="card err">입력 오류: ${e.message}</div>`; return; }
+
+  startTimer(btn,'오늘의 운세 쓰는 중');
+  try{
+    const r=await fetch('/api/daily',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    document.getElementById('reading-slot').outerHTML=`
+      <div class="card">
+        <h3>오늘의 운세 · ${d.iljin.dateStr}</h3>
+        <p class="muted">오늘의 간지: <b>${d.iljin.ganZhiKo}</b>(${d.iljin.ganZhiHan}) · 오행 ${d.iljin.wuXing} · 나에게 ${d.iljin.tenGod}</p>
+        <div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>
+        ${actionsBar()}
+      </div>`;
+  }catch(e){
+    const s=document.getElementById('reading-slot');
+    if(s) s.outerHTML=`<div class="card err">오늘의 운세 오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'오늘의 운세 보기'); }
+}
+
+async function runLuck(){
+  const btn=document.querySelector('#view-one button.go[onclick="runLuck()"]');
+  const out=document.getElementById('out-one');
+  const body=readForm('one');
+  out.innerHTML=`<div class="card muted">세운·월운을 계산하는 중…</div>`;
+  let saju;
+  try{
+    const rc=await fetch('/api/saju',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const dc=await rc.json(); if(!dc.ok) throw new Error(dc.error); saju=dc.saju;
+    out.innerHTML=sajuCards(saju,body.name||'') +
+      `<div class="card muted" id="reading-slot">🔮 올해·이번 달 운세를 쓰는 중입니다. 로컬 AI라 <b>1~2분</b> 걸려요.</div>`;
+  }catch(e){ out.innerHTML=`<div class="card err">입력 오류: ${e.message}</div>`; return; }
+
+  startTimer(btn,'운세 쓰는 중');
+  try{
+    const r=await fetch('/api/luck',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    document.getElementById('reading-slot').outerHTML=`
+      <div class="card">
+        <h3>${d.luck.dateStr} 운세</h3>
+        <p class="muted">${d.luck.year.label}: <b>${d.luck.year.ganZhiKo}</b> · 나에게 ${d.luck.year.tenGod} &nbsp;|&nbsp; ${d.luck.month.label}: <b>${d.luck.month.ganZhiKo}</b> · ${d.luck.month.tenGod}</p>
+        <div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>
+        ${actionsBar()}
+      </div>`;
+  }catch(e){
+    const s=document.getElementById('reading-slot');
+    if(s) s.outerHTML=`<div class="card err">운세 오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'올해·이번 달 운세'); }
+}
+
+async function runFamily(){
+  const btn=document.querySelector('#view-one button.go[onclick="runFamily()"]');
+  const out=document.getElementById('out-one');
+  const body=readForm('one');
+  out.innerHTML=`<div class="card muted">가족운을 분석하는 중…</div>`;
+  let saju;
+  try{
+    const rc=await fetch('/api/saju',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const dc=await rc.json(); if(!dc.ok) throw new Error(dc.error); saju=dc.saju;
+    out.innerHTML=sajuCards(saju,body.name||'') +
+      `<div class="card muted" id="reading-slot">🔮 가족운 풀이를 쓰는 중… 로컬 AI <b>1~2분</b>. 다른 창을 닫으면 빨라집니다.</div>`;
+  }catch(e){ out.innerHTML=`<div class="card err">입력 오류: ${e.message}</div>`; return; }
+  startTimer(btn,'가족운 쓰는 중');
+  try{
+    const r=await fetch('/api/family',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    const f=d.family;
+    document.getElementById('reading-slot').outerHTML=`
+      <div class="card">
+        <h3>가족운 근거</h3>
+        <p class="muted" style="font-size:.84rem">
+          <b>배우자궁(일지)</b>: ${f.배우자.gung} · 12운성 ${f.배우자.un12} · ${f.배우자.relation}<br>
+          <b>자녀궁(시주)</b>: ${f.자녀.gung} · 12운성 ${f.자녀.un12} · ${f.자녀.relation}<br>
+          <b>부모·형제(년월주)</b>: 월주 12운성 ${f.부모.month12}
+        </p>
+      </div>
+      <div class="card"><h3>가족운 풀이</h3><div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>${actionsBar({noCard:true})}</div>`;
+  }catch(e){
+    const s=document.getElementById('reading-slot');
+    if(s) s.outerHTML=`<div class="card err">가족운 오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'가족운 (부모·형제·배우자·자녀)'); }
+}
+
+async function runIreum(){
+  const btn=document.querySelector('#view-one button.go[onclick="runIreum()"]');
+  const out=document.getElementById('out-one');
+  const nameField=document.getElementById('one-checkname').value.trim() || document.getElementById('one-name').value.trim();
+  if(!nameField){ out.innerHTML=`<div class="card err">풀이할 이름을 입력하세요 (한글 2글자 이상).</div>`; return; }
+  const body={...readForm('one'), checkName:nameField};
+  out.innerHTML=`<div class="card muted">이름 "${nameField}"의 오행을 분석하는 중…</div>`;
+  startTimer(btn,'이름 분석 중');
+  try{
+    const r=await fetch('/api/ireum',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    const a=d.name;
+    const wxColor=(w)=>WXCOLOR[w]||'var(--muted)';
+    const chips=a.syllables.map(s=>`<span class="badge" style="border-color:${wxColor(s.wx)}">${s.ch} · ${s.wx}(${WXHAN[s.wx]})</span>`).join(' ');
+    const flowStr=a.flow.map(f=>`<span style="color:${f.good?'var(--wx-mok)':'var(--wx-hwa)'}">${f.from}→${f.to} ${f.type}</span>`).join(' &nbsp; ');
+    const vc=a.score>=62?'var(--wx-mok)':a.score>=45?'var(--wx-to)':'var(--wx-hwa)';
+    out.innerHTML=`
+      <div class="card">
+        <h3>"${a.name}" 이름 오행</h3>
+        <p>${chips}</p>
+        <p class="muted">발음오행 흐름: ${flowStr||'-'}</p>
+        <p><b style="color:${vc}">${a.verdict}</b> · ${a.score}점 / 100</p>
+        <p class="muted" style="font-size:.84rem">
+          ${a.supplies.length?`이름이 채워주는 기운: <b>${a.supplies.join(', ')}</b><br>`:''}
+          ${a.missing.length?`필요한데 이름에 없는 기운: ${a.missing.join(', ')}<br>`:''}
+          ${a.piles.length?`과하게 보태는 기운: ${a.piles.join(', ')}`:''}
+        </p>
+        <p class="muted" style="font-size:.76rem">※ 한글 발음오행(소리오행) 기준입니다. 한자 뜻(자원오행)·획수(수리)는 별도로 봐야 합니다.</p>
+      </div>
+      <div class="card"><h3>풀이</h3><div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>${actionsBar({noCard:true})}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="card err">이름 분석 오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'이름 오행'); }
+}
+
+async function runBanwi(){
+  const btn=document.querySelector('#view-one button.go[onclick="runBanwi()"]');
+  const out=document.getElementById('out-one');
+  const body={...readForm('one'), targetYear:new Date().getFullYear()};
+  out.innerHTML=`<div class="card muted">방위를 계산하는 중…</div>`;
+  startTimer(btn,'방위 분석 중');
+  try{
+    const r=await fetch('/api/banwi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    const b=d.banwi;
+    // 3x3 나침반 (가운데는 현재 위치)
+    const pos={'북서':[0,0],'북':[0,1],'북동':[0,2],'서':[1,0],'중':[1,1],'동':[1,2],'남서':[2,0],'남':[2,1],'남동':[2,2]};
+    const cell=(dir)=>{
+      if(dir==='중') return `<div style="background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:12px 4px;text-align:center;font-size:.8rem;color:var(--muted)">현재<br>집</div>`;
+      const t=b.table.find(x=>x.dir===dir)||{verdict:'평이',reasons:[]};
+      const c=t.verdict==='좋음'?'var(--wx-mok)':t.verdict==='피하기'?'var(--wx-hwa)':'var(--line)';
+      const bg=t.verdict==='좋음'?'rgba(79,157,105,.12)':t.verdict==='피하기'?'rgba(214,96,77,.12)':'var(--card)';
+      return `<div style="border:2px solid ${c};background:${bg};border-radius:8px;padding:10px 4px;text-align:center">
+        <div style="font-weight:700">${dir}</div>
+        <div style="font-size:.76rem;color:${c}">${t.verdict}</div>
+        <div style="font-size:.66rem;color:var(--muted)">${t.reasons.join(' ')}</div>
+      </div>`;
+    };
+    const grid=[0,1,2].map(row=>[0,1,2].map(col=>{
+      const dir=Object.keys(pos).find(k=>pos[k][0]===row&&pos[k][1]===col);
+      return cell(dir);
+    }).join('')).join('');
+    out.innerHTML=`
+      <div class="card">
+        <h3>${b.year}년(${b.yearGanZhi}) 이사 방위</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0">${grid}</div>
+        <p class="muted" style="font-size:.8rem">현재 사는 집을 가운데에 두고, 새 집이 어느 방향인지로 봅니다.
+        올해 대장군방: <b>${b.daejanggun||'-'}</b> · 삼살방: <b>${b.samsal.join(', ')||'-'}</b></p>
+      </div>
+      <div class="card"><h3>풀이</h3><div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>${actionsBar({noCard:true})}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="card err">방위 분석 오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'이사 방위 (어느 쪽으로?)'); }
+}
+
+async function runTiming(){
+  const btn=document.querySelector('#view-one button.go[onclick="runTiming()"]');
+  const out=document.getElementById('out-one');
+  const body={...readForm('one'), topic:document.getElementById('one-timing').value};
+  out.innerHTML=`<div class="card muted">앞으로 12년 흐름을 계산하는 중…</div>`;
+  startTimer(btn,'시기 분석 중');
+  try{
+    const r=await fetch('/api/timing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    const rc=(v)=> v==='좋음'?'var(--wx-mok)': v==='주의'?'var(--wx-hwa)':'var(--muted)';
+    const rows=d.years.map(y=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)">
+        <b style="width:52px">${y.year}</b>
+        <span style="width:44px" class="muted">${y.ganZhiKo}</span>
+        <span style="width:56px;color:${rc(y.rating)};font-weight:700">${y.rating}</span>
+        <span class="muted" style="font-size:.8rem;flex:1">${y.tenGod}운 · ${y.notes.join(', ')||'-'}</span>
+      </div>`).join('');
+    out.innerHTML=`
+      <div class="card">
+        <h3>${document.getElementById('one-timing').selectedOptions[0].text} — 앞으로 12년</h3>
+        ${rows}
+        <p class="muted" style="font-size:.78rem">세운(그 해 간지)의 십신과 용신/기신을 종합한 자동 평가입니다.</p>
+      </div>
+      <div class="card"><h3>풀이</h3><div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>${actionsBar({noCard:true})}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="card err">시기 분석 오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'시기 분석 (언제가 좋을까?)'); }
+}
+
+async function runTaegil(){
+  const btn=document.querySelector('#view-one button.go[onclick="runTaegil()"]');
+  const out=document.getElementById('out-one');
+  const body={...readForm('one'), eventType:document.getElementById('one-event').value};
+  out.innerHTML=`<div class="card muted">${body.eventType}에 좋은 날을 계산하는 중…</div>`;
+  startTimer(btn,'택일 계산 중');
+  try{
+    const r=await fetch('/api/taegil',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    const rows=(d.days||[]).map(x=>`
+      <div style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)">
+        <div><b>${x.date}</b> (${x.weekday}) <span class="muted">${x.lunar}</span><br>
+          <span class="muted" style="font-size:.82rem">${x.ganZhiKo} · ${x.notes.join(' · ')}</span></div>
+        <div style="align-self:center"><span class="badge">${x.score}점</span></div>
+      </div>`).join('');
+    out.innerHTML=`
+      <div class="card">
+        <h3>${d.eventType} 좋은 날 (앞으로 45일)</h3>
+        ${rows || '<p class="muted">조건에 맞는 날을 찾지 못했습니다.</p>'}
+        <p class="muted" style="font-size:.78rem">황도길일·십신·손없는날 기준 자동 선별. 본인 일지와 충(沖)하는 날은 제외했습니다.</p>
+      </div>
+      <div class="card"><h3>풀이</h3><div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>${actionsBar({noCard:true})}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="card err">택일 오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'택일 (좋은 날 찾기)'); }
+}
+
+function yaoRow(v){
+  // 6 노음(x) 7 소양(—) 8 소음(- -) 9 노양(o)
+  const yang = (v===7||v===9), changing=(v===6||v===9);
+  const bar = yang
+    ? `<span style="display:inline-block;width:120px;height:12px;background:var(--ink);border-radius:2px"></span>`
+    : `<span style="display:inline-block;width:52px;height:12px;background:var(--ink);border-radius:2px"></span><span style="display:inline-block;width:16px"></span><span style="display:inline-block;width:52px;height:12px;background:var(--ink);border-radius:2px"></span>`;
+  return `<div style="margin:7px 0">${bar} ${changing?`<b style="color:var(--wx-hwa)">●변</b>`:''}</div>`;
+}
+
+async function runIching(){
+  const btn=document.querySelector('#view-iching .go');
+  const linesBox=document.getElementById('ic-lines');
+  const out=document.getElementById('out-iching');
+  out.innerHTML='';
+  btn.disabled=true;
+  // 던지는 연출: 아래→위 6줄을 순차 표시 (실제 캐스팅은 서버)
+  const preview=[];
+  linesBox.innerHTML='';
+  for(let i=0;i<6;i++){
+    await new Promise(r=>setTimeout(r,180));
+    const v=[6,7,8,9][Math.floor(Math.random()*4)]; preview.unshift(v);
+    linesBox.innerHTML=preview.map(yaoRow).join('');
+  }
+  btn.textContent='괘를 풀이하는 중… (로컬 AI 1~2분)';
+  startTimer(btn,'풀이하는 중');
+  try{
+    const q=document.getElementById('ic-q').value;
+    const r=await fetch('/api/iching',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    // 서버가 실제로 뽑은 6효로 다시 그림
+    linesBox.innerHTML=d.cast.lines.slice().reverse().map(yaoRow).join('');
+    const c=d.cast;
+    out.innerHTML=`
+      <div class="card">
+        <h3>${c.primary.name} <span class="muted">(${c.primary.num}번)</span></h3>
+        <p>${c.primary.meaning}</p>
+        ${c.changed
+          ? `<p class="muted">변효: ${c.changingYao.join(', ')} → 변괘 <b>${c.changed.name}</b>(${c.changed.num}번)<br>${c.changed.meaning}</p>`
+          : `<p class="muted">변효 없음 — 본괘로만 봅니다.</p>`}
+      </div>
+      <div class="card">
+        <h3>풀이</h3>
+        <div class="reading">${mdToHtml(d.reading)}</div>
+        <p class="muted">모델: ${d.model} · 참고용</p>
+        ${actionsBar({noCard:true})}
+      </div>`;
+  }catch(e){
+    out.innerHTML=`<div class="card err">오류: ${e.message}</div>`;
+  }finally{ stopTimer(btn,'🪙 동전 던지기'); }
+}
+
+async function runGung(){
+  const btn=document.querySelector('#view-gung .go');
+  const out=document.getElementById('out-gung');
+  out.innerHTML=`<div class="card muted">두 사람의 사주를 계산하는 중…</div>`;
+  startTimer(btn,'AI가 궁합 보는 중');
+  try{
+    const r=await fetch('/api/gunghap',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({a:readForm('a'),b:readForm('b')})});
+    const d=await r.json(); if(!d.ok) throw new Error(d.error);
+    out.innerHTML = sajuCards(d.a,'A') + sajuCards(d.b,'B') +
+      `<div class="card"><h3>궁합 풀이</h3><div class="reading">${mdToHtml(d.reading)}</div>
+       <p class="muted">모델: ${d.model} · 참고용</p>${actionsBar()}</div>`;
+  }catch(e){
+    out.innerHTML=`<div class="card err">오류: ${e.message}<br><span class="muted">로컬 AI는 궁합에 3분 이상 걸릴 수 있습니다.</span></div>`;
+  }finally{ stopTimer(btn,'궁합 보기'); }
+}
+</script>
+</body>
+</html>

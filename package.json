@@ -1,0 +1,20 @@
+{
+  "name": "dongmundang",
+  "version": "1.6.0",
+  "description": "동문당 - 사주 풀이 / 주역점 웹앱",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": ["saju", "fortune", "iching"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "lunar-javascript": "^1.7.7"
+  }
+}
