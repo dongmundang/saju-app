@@ -54,6 +54,20 @@ function parseBody(b) {
   };
 }
 
+// 임시 진단용 (배포 환경변수 확인, 나중에 제거)
+app.get('/api/keyinfo', (req, res) => {
+  const raw = process.env.ANTHROPIC_API_KEY || '';
+  const clean = raw.trim().replace(/^["']|["']$/g, '').trim();
+  res.json({
+    rawLength: raw.length,
+    cleanLength: clean.length,
+    prefix: clean.slice(0, 14),
+    suffix: clean.slice(-6),
+    hadWhitespace: raw !== clean,
+    model: MODEL
+  });
+});
+
 // 사주팔자 계산만
 app.post('/api/saju', (req, res) => {
   try {
