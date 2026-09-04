@@ -237,7 +237,7 @@ function sajuSummaryText(s) {
     s.strength && s.strength.yongsin.length ? `억부용신(도움되는 오행): ${s.strength.yongsin.join(', ')} / 꺼리는 오행: ${s.strength.gisin.join(', ')}` : ``,
     s.sinsal && s.sinsal.length ? `신살: ${s.sinsal.map(x => `${x.name}(${x.at})`).join(', ')}` : ``,
     s.unseong ? `12운성 - 년:${s.unseong.year}, 월:${s.unseong.month}, 일:${s.unseong.day}, 시:${s.unseong.time}` : ``,
-    s.relations && s.relations.length ? `지지 관계: ${s.relations.map(r => `${r.type}(${r.zhi})`).join(', ')}` : ``,
+    s.relations && s.relations.length ? `지지 관계: ${s.relations.map(r => `${r.type}(${String(r.zhi).split('').map(c => k(ZHI, c)).join('·')})`).join(', ')}` : ``,
     s.samjae && s.samjae.active ? `삼재: ${s.samjae.upcoming.map(u => `${u.year}년 ${u.phase}`).join(', ')}` : ``,
     (s.daeun && s.daeun.length) ? `대운(10년 단위)${s.daeunBasis ? ' [' + s.daeunBasis + ' 기준 길흉]' : ''}:\n${s.daeun.map(d => `  - ${d.startYear}~${d.endYear}년 (${d.startAge}세~) ${d.ganZhiKo}${d.label && d.label !== '평이' ? ' = ' + d.label : ''}${d.current ? '  ← 현재 대운' : ''}`).join('\n')}` : ``,
     `오늘 기준 연도: ${new Date().getFullYear()}년`
