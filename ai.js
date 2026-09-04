@@ -22,6 +22,28 @@ const SYSTEM = `당신은 30년 경력의 사주명리 상담가입니다. 손�
 
 const USING = ANTHROPIC_KEY ? `Claude(${CLAUDE_MODEL})` : `Ollama(${OLLAMA_MODEL})`;
 
+// AI가 가끔 신살·용어 뒤에 엉뚱한 한자/자리표시를 붙임 → 사후 정리
+function sanitize(text) {
+  if (!text) return text;
+  let t = text;
+  // 자주 나오는 잘못된 한자 교정
+  t = t.replace(/驛馬殺|逆馬殺/g, '역마살');
+  // 이름(같은이름...) 중복 괄호 정리: "역마살(역마살, ...)" → "역마살(..."
+  t = t.replace(/([가-힣]{2,4})\(\1([,，、\s])/g, '$1(');
+  t = t.replace(/([가-힣]{2,4})\(\1\)/g, '$1');
+  // 이름 뒤에 붙은 '한자 자리표시' 괄호 제거: (日主) (年·月) (時柱) (年·月주) 등
+  // 한자 자리글자(日月年時柱主)가 하나라도 들어 있는 짧은 괄호만 대상 — 한글만 든 (월주)는 유지
+  t = t.replace(/([가-힣]{2,5})\s*[（(](?=[^）)]{0,10}[日月年時柱主])[日月年時柱主주일월년시·、,\s／/～~-]{1,10}[）)]/g, '$1');
+  // "역마살(逆馬殺)" 처럼 한글이름(한자이름) 형태에서 한자만 남은 괄호가 이름 반복이면 제거
+  t = t.replace(/([가-힣]{2,4})\s*[（(][㐀-鿿]{2,4}[）)]/g, (m, ko) => {
+    // 사주팔자 간지(을미·기묘 등)는 유지, 신살류만 정리
+    return /(살|귀인)$/.test(ko) ? ko : m;
+  });
+  // 괄호 안팎 공백 정리
+  t = t.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\(\)/g, '');
+  return t;
+}
+
 async function generate(prompt) {
   if (ANTHROPIC_KEY) return generateClaude(prompt);
   return generateOllama(prompt);
@@ -44,7 +66,7 @@ async function generateClaude(prompt) {
   });
   if (!res.ok) throw new Error(`Claude API 오류: ${res.status} ${await res.text()}`);
   const data = await res.json();
-  return data.content.map(c => c.text || '').join('').trim();
+  return sanitize(data.content.map(c => c.text || '').join('').trim());
 }
 
 async function generateOllama(prompt) {
@@ -64,7 +86,7 @@ async function generateOllama(prompt) {
   }
   if (!res.ok) throw new Error(`Ollama 오류: ${res.status} ${await res.text()}`);
   const data = await res.json();
-  return data.response.trim();
+  return sanitize(data.response.trim());
 }
 
 // ── 주제별 풀이 ──
