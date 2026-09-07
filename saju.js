@@ -187,7 +187,7 @@ function calcSaju(opts) {
       ganKo: k(GAN, dayGan),
       wuXing: GAN_WX[dayGan],
       yinYang: GAN_YINYANG[dayGan],
-      desc: `일간(본인)은 ${k(GAN, dayGan)}, 오행은 ${GAN_WX[dayGan]}(${GAN_YINYANG[dayGan]})입니다.`
+      desc: `일간(본인)은 ${k(GAN, dayGan)}(${dayGan}), 오행은 ${GAN_WX[dayGan]}, 음양은 ${GAN_YINYANG[dayGan]}입니다.`
     },
     wuXing: {
       count: wuXingCount,
@@ -227,7 +227,7 @@ function sajuSummaryText(s) {
     `성별: ${s.input.gender}`,
     `양력 생일: ${s.input.solar}`,
     `사주팔자: 년주 ${p.year.ko}(${p.year.han}), 월주 ${p.month.ko}(${p.month.han}), 일주 ${p.day.ko}(${p.day.han}), 시주 ${p.time.ko}(${p.time.han})`,
-    `일간(본인): ${s.dayMaster.ganKo} / 오행 ${s.dayMaster.wuXing} / ${s.dayMaster.yinYang}`,
+    `일간(본인): ${s.dayMaster.ganKo}(${s.dayMaster.gan}) / 오행 ${s.dayMaster.wuXing} / 음양: ${s.dayMaster.yinYang}`,
     `오행 분포 - 목:${wx.목} 화:${wx.화} 토:${wx.토} 금:${wx.금} 수:${wx.수}`,
     s.wuXing.lacking.length ? `부족한 오행: ${s.wuXing.lacking.join(', ')}` : `부족한 오행 없음`,
     s.wuXing.strong.length ? `강한 오행: ${s.wuXing.strong.join(', ')}` : ``,
