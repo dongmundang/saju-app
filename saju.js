@@ -301,10 +301,36 @@ function familySummary(saju) {
   };
 }
 
+// 만 나이 계산 (콘텐츠가 나이에 맞는지 판단하는 용도 — 생일 지남 여부까지는 안 따짐)
+function ageOf(saju) {
+  const y = parseInt(String(saju.input.solar).slice(0, 4), 10);
+  if (!y) return null;
+  return new Date().getFullYear() - y;
+}
+
 function buildFamilyPrompt(saju) {
   const f = familySummary(saju);
   const g = saju.input.gender;
-  return `아래는 한 사람(${g})의 사주에서 가족운 관련 정보입니다.
+  const age = ageOf(saju);
+  const isMinor = age != null && age < 19;
+
+  const siblingLine = isMinor
+    ? '### 형제·또래 인연\n비겁의 힘으로 본 형제자매·또래 친구 관계의 특징. 경쟁인지 협력인지, 도움을 주고받는 관계인지. "직장 동료" 같은 성인 사회생활 표현은 쓰지 말 것. (3~4문장)'
+    : '### 형제·동료 인연\n비겁의 힘으로 본 형제·친구·동료 관계의 특징. 경쟁인지 협력인지, 도움을 주고받는 관계인지. (3~4문장)';
+
+  const spouseOrTalentLine = isMinor
+    ? '### 재능과 자기표현\n식상(표현력·재능)의 상태로 본 이 사람이 타고난 재능과 자기표현 방식. 시주(전통적으로 "자녀궁"이라 부르는 자리)는 이 나이대엔 타고난 개성·잠재력을 보는 자리로 풀이할 것. 연애·결혼·직장 이야기는 절대 하지 말 것. (5~6문장)'
+    : `### 배우자\n남자는 재성, 여자는 관성, 그리고 배우자궁(일지)의 오행·12운성·형충으로 본 배우자의 모습과 성향, 만나기 쉬운 인연, 부부관계에서 유의할 점. (5~6문장)`;
+
+  const childLine = isMinor
+    ? ''
+    : `\n\n### 자녀\n남자는 관성, 여자는 식상, 자녀궁(시주)의 상태로 본 자녀와의 인연, 자녀운의 흐름, 자녀를 대할 때 도움이 되는 태도. (4~5문장)`;
+
+  const ageNote = isMinor
+    ? `\n\n※ 이 사람은 현재 만 ${age}세로 미성년자(아동/청소년)입니다. 연애·결혼·배우자·직장 동료 등 성인의 삶을 전제로 한 표현은 절대 쓰지 마세요. 지금 나이에 맞게 "타고난 성향"과 "자라면서 드러날 잠재력"으로만 풀이하세요.`
+    : '';
+
+  return `아래는 한 사람(${g}, 만 ${age != null ? age + '세' : '나이 미상'})의 사주에서 가족운 관련 정보입니다.${ageNote}
 
 [부모] ${f.부모.note} / 월주 12운성 ${f.부모.month12} / 관계 ${[...f.부모.monthRel, ...f.부모.yearRel].join(',') || '특이사항 없음'}
 [형제] ${f.형제.note}
@@ -319,17 +345,12 @@ function buildFamilyPrompt(saju) {
 ### 부모와의 인연
 년주·월주, 인성(어머니)·편재(아버지)의 상태로 본 부모와의 관계, 어린 시절의 분위기, 부모에게 받은 것과 아쉬웠던 것. (4~5문장)
 
-### 형제·동료 인연
-비겁의 힘으로 본 형제·친구·동료 관계의 특징. 경쟁인지 협력인지, 도움을 주고받는 관계인지. (3~4문장)
+${siblingLine}
 
-### 배우자
-남자는 재성, 여자는 관성, 그리고 배우자궁(일지)의 오행·12운성·형충으로 본 배우자의 모습과 성향, 만나기 쉬운 인연, 부부관계에서 유의할 점. (5~6문장)
-
-### 자녀
-남자는 관성, 여자는 식상, 자녀궁(시주)의 상태로 본 자녀와의 인연, 자녀운의 흐름, 자녀를 대할 때 도움이 되는 태도. (4~5문장)
+${spouseOrTalentLine}${childLine}
 
 ### 상담가의 조언
-가족 안에서 이 분이 편안해지기 위한 구체적 조언 2~3가지.
+${isMinor ? '이 아이를 키우는 데 참고할 만한 구체적 조언 2~3가지.' : '가족 안에서 이 분이 편안해지기 위한 구체적 조언 2~3가지.'}
 
 규칙: 위 정보와 사주에 나온 십신·오행·12운성만 근거로, 자녀 수처럼 없는 사실을 단정하지 말 것. 12운성이 약한 자리(절·묘·병 등)나 형충이 있으면 "인연의 거리감"이나 "서로 맞춰가는 노력이 필요한 관계"처럼 부드럽게 표현. 겁주지 말 것. 한국어.
 마지막에 "※ 가족의 인연은 서로의 노력으로 더 좋아질 수 있습니다." 를 덧붙이세요.`;
@@ -373,10 +394,10 @@ function analyzeStrength(dayGanHan, gans, zhis, hideRaw) {
 
   gans.forEach((g, i) => { if (i !== 2) bump(GAN_WX[g], ganW[i]); });
   zhis.forEach((z, i) => bump(ZHI_WX[z], zhiW[i]));
-  // 지장간 정기(마지막 원소)에 지지 절반 가중
+  // 지장간 정기(첫 원소 — lunar-javascript는 정기를 배열 맨 앞에 반환)에 지지 절반 가중
   ['year', 'month', 'day', 'time'].forEach((key, i) => {
     const arr = hideRaw[key] || [];
-    if (arr.length) bump(GAN_WX[arr[arr.length - 1]], zhiW[i] * 0.5);
+    if (arr.length) bump(GAN_WX[arr[0]], zhiW[i] * 0.5);
   });
 
   const total = friend + foe;
@@ -665,4 +686,4 @@ function healthHintText(s) {
   return lines.join('\n');
 }
 
-module.exports = { calcSaju, sajuSummaryText, getTodayIljin, getCurrentLuck, scanYears, buildTimingPrompt, familySummary, buildFamilyPrompt, healthHintText, tenGod, TOPIC_GOOD_SHIN };
+module.exports = { calcSaju, sajuSummaryText, getTodayIljin, getCurrentLuck, scanYears, buildTimingPrompt, familySummary, buildFamilyPrompt, healthHintText, tenGod, TOPIC_GOOD_SHIN, ageOf };

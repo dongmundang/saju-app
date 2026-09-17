@@ -13,7 +13,7 @@ try {
   }
 } catch (e) { /* .env 없어도 됨 */ }
 
-const { calcSaju, sajuSummaryText, getTodayIljin, getCurrentLuck, scanYears, buildTimingPrompt, familySummary, buildFamilyPrompt, healthHintText } = require('./saju');
+const { calcSaju, sajuSummaryText, getTodayIljin, getCurrentLuck, scanYears, buildTimingPrompt, familySummary, buildFamilyPrompt, healthHintText, ageOf } = require('./saju');
 const { generate, buildPrompt, buildDailyPrompt, buildLuckPrompt, buildGunghapPrompt, MODEL } = require('./ai');
 const { castHexagram, buildIchingPrompt } = require('./iching');
 const { findGoodDays, buildTaegilPrompt } = require('./taegil');
@@ -41,12 +41,18 @@ app.use((req, res, next) => {
 app.use(express.static(__dirname, { index: 'index.html' }));
 
 function parseBody(b) {
+  const year = parseInt(b.year, 10);
+  const month = parseInt(b.month, 10);
+  const day = parseInt(b.day, 10);
+  const hour = b.hour === '' || b.hour == null ? 12 : parseInt(b.hour, 10);
+  const minute = b.minute ? parseInt(b.minute, 10) : 0;
+  if (!Number.isInteger(year) || year < 1900 || year > 2100) throw new Error('생년(연도)을 확인해주세요.');
+  if (!Number.isInteger(month) || month < 1 || month > 12) throw new Error('태어난 월을 확인해주세요 (1~12).');
+  if (!Number.isInteger(day) || day < 1 || day > 31) throw new Error('태어난 일을 확인해주세요 (1~31).');
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23) throw new Error('태어난 시간을 확인해주세요 (0~23).');
+  if (!Number.isInteger(minute) || minute < 0 || minute > 59) throw new Error('태어난 분을 확인해주세요 (0~59).');
   return {
-    year: parseInt(b.year, 10),
-    month: parseInt(b.month, 10),
-    day: parseInt(b.day, 10),
-    hour: b.hour === '' || b.hour == null ? 12 : parseInt(b.hour, 10),
-    minute: b.minute ? parseInt(b.minute, 10) : 0,
+    year, month, day, hour, minute,
     isLunar: !!b.isLunar,
     isLeapMonth: !!b.isLeapMonth,
     trueSolarTime: b.trueSolarTime !== false,
@@ -73,7 +79,7 @@ app.post('/api/reading', async (req, res) => {
     if (topic === '건강') {
       text += `\n\n[오행-건강 참고]\n${healthHintText(saju)}`;
     }
-    const reading = await generate(buildPrompt(topic, text));
+    const reading = await generate(buildPrompt(topic, text, null, ageOf(saju)));
     res.json({ ok: true, saju, topic, reading, model: MODEL });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
@@ -85,7 +91,7 @@ app.post('/api/daily', async (req, res) => {
   try {
     const saju = calcSaju(parseBody(req.body));
     const iljin = getTodayIljin(saju.dayMaster.gan);
-    const reading = await generate(buildDailyPrompt(sajuSummaryText(saju), iljin));
+    const reading = await generate(buildDailyPrompt(sajuSummaryText(saju), iljin, ageOf(saju)));
     res.json({ ok: true, saju, iljin, reading, model: MODEL });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
@@ -97,7 +103,7 @@ app.post('/api/luck', async (req, res) => {
   try {
     const saju = calcSaju(parseBody(req.body));
     const luck = getCurrentLuck(saju.dayMaster.gan);
-    const reading = await generate(buildLuckPrompt(sajuSummaryText(saju), luck));
+    const reading = await generate(buildLuckPrompt(sajuSummaryText(saju), luck, ageOf(saju)));
     res.json({ ok: true, saju, luck, reading, model: MODEL });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
