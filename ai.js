@@ -6,7 +6,7 @@ const OLLAMA_KEEPALIVE = process.env.OLLAMA_KEEPALIVE || '20s';
 // 키에 실수로 공백/따옴표/개행이 붙어도 제거 (배포 환경변수 붙여넣기 실수 대비)
 const ANTHROPIC_KEY = (process.env.ANTHROPIC_API_KEY || '').trim().replace(/^["']|["']$/g, '').trim();
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5';
-const CLAUDE_MAX_TOKENS = parseInt(process.env.CLAUDE_MAX_TOKENS || '4000', 10);
+const CLAUDE_MAX_TOKENS = parseInt(process.env.CLAUDE_MAX_TOKENS || '8000', 10);
 
 const SYSTEM = `당신은 30년 경력의 사주명리 상담가입니다. 손님의 사주 원국과 대운을 깊이 있게 읽고, 따뜻하지만 솔직하게 상담합니다.
 
