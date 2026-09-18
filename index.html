@@ -184,7 +184,7 @@
       </div>
       <p class="muted" style="font-size:.78rem;margin-top:10px">
         사주팔자·신강신약·신살·대운 등 <b>계산 결과는 즉시</b> 나옵니다.
-        AI 풀이 글은 <b>20~40초</b>, 종합 리포트는 <b>2~3분</b> 정도 걸립니다.
+        AI 풀이 글은 <b>40~70초</b>, 종합 리포트는 <b>4~6분</b> 정도 걸립니다.
       </p>
     </div>
     <div id="out-one"></div>
@@ -580,7 +580,7 @@ async function runOne(){
     const rc=await fetch('/api/saju',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const dc=await rc.json(); if(!dc.ok) throw new Error(dc.error); saju=dc.saju;
     out.innerHTML=reportHead(body.name||'', saju) + sajuCards(saju,body.name||'') +
-      `<div class="card muted noprint" id="reading-slot">🔮 AI가 풀이를 쓰는 중입니다. 20~40초 정도 걸려요. 창을 닫지 마세요.</div>`;
+      `<div class="card muted noprint" id="reading-slot">🔮 AI가 풀이를 쓰는 중입니다. 40~70초 정도 걸려요. 창을 닫지 마세요.</div>`;
   }catch(e){ out.innerHTML=`<div class="card err">입력 오류: ${e.message}</div>`; return; }
 
   startTimer(btn,'AI가 풀이 쓰는 중');
